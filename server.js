@@ -22,7 +22,7 @@ mongoose
   })
   .then(() => console.log('DB connection successful!'));
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000; //heroku won't work with out .env.port
 const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
