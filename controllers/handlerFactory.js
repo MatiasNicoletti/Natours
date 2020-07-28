@@ -19,7 +19,7 @@ exports.deleteOne = Model =>
 exports.updateOne = Model =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      new: true, //return the new document
       runValidators: true
     });
 
@@ -45,6 +45,12 @@ exports.createOne = Model =>
         data: doc
       }
     });
+    // const id = tours[tours.length - 1].id + 1;
+    // const tour = Object.assign({ id: id }, req.body);
+    // tours.push(tour);
+    // fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), response => {
+    //
+    // });
   });
 
 exports.getOne = (Model, popOptions) =>
@@ -67,7 +73,7 @@ exports.getOne = (Model, popOptions) =>
 
 exports.getAll = Model =>
   catchAsync(async (req, res, next) => {
-    // To allow for nested GET reviews on tour (hack)
+    //to allow nested get reviews on tour
     let filter = {};
     if (req.params.tourId) filter = { tour: req.params.tourId };
 

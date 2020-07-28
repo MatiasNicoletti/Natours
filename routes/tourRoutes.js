@@ -57,5 +57,9 @@ router
     authController.restrictTo('admin', 'lead-guide'),
     tourController.deleteTour
   );
+    //nested routes moved to the review router
+// router.route('/:tour_id/reviews')
+//     .post(authController.protect, authController.restrictTo('user'),
+//     reviewController.create);
 
 module.exports = router;

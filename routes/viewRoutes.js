@@ -6,7 +6,7 @@ const bookingController = require('../controllers/bookingController');
 const router = express.Router();
 
 router.get('/', authController.isLoggedIn, viewsController.getOverview);
-
+// if it is only get the .route is not necessary
 router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
 router.get('/login', authController.isLoggedIn, viewsController.getLoginForm);
 router.get('/me', authController.protect, viewsController.getAccount);

@@ -6,7 +6,7 @@ const factory = require('./handlerFactory');
 const AppError = require('./../utils/appError');
 
 const multerStorage = multer.memoryStorage();
-
+// const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
@@ -71,11 +71,23 @@ exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 exports.createTour = factory.createOne(Tour);
 exports.updateTour = factory.updateOne(Tour);
 exports.deleteTour = factory.deleteOne(Tour);
+// exports.deleteTour = catchAsync(async (req, res, next) => { changed for handlerFactory
 
+//     const tour = await Tour.findByIdAndDelete(req.params.id);
+
+//     if(!tour){ //null is false
+//         return next(new AppError('No tour found with that ID', 404)); //with the return goes out of the function so the res.send is not executed
+//     }
+
+//     res.status(200).json({
+//         status: 'success',
+
+//     });
+// });
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
-      $match: { ratingsAverage: { $gte: 4.5 } }
+      $match: { ratingsAverage: { $gte: 4.5 } } //like a sql select in a field
     },
     {
       $group: {
@@ -131,11 +143,11 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     },
     {
       $project: {
-        _id: 0
+        _id: 0 //to hide it
       }
     },
     {
-      $sort: { numTourStarts: -1 }
+      $sort: { numTourStarts: -1 }  // desc
     },
     {
       $limit: 12

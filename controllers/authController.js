@@ -52,15 +52,15 @@ exports.signup = catchAsync(async (req, res, next) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body;//because the var names are the same they can go with {}
 
   // 1) Check if email and password exist
   if (!email || !password) {
     return next(new AppError('Please provide email and password!', 400));
   }
   // 2) Check if user exists && password is correct
-  const user = await User.findOne({ email }).select('+password');
-
+  const user = await User.findOne({ email }).select('+password'); //+ because it's not selected
+// if user does not exist user.correctPassword will never be executed
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
@@ -175,7 +175,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // 2) Generate the random reset token
   const resetToken = user.createPasswordResetToken();
-  await user.save({ validateBeforeSave: false });
+  await user.save({ validateBeforeSave: false }); //without this the db will ask for all the fields
 
   // 3) Send it to user's email
   try {

@@ -49,7 +49,7 @@ const tourSchema = new mongoose.Schema(
     priceDiscount: {
       type: Number,
       validate: {
-        validator: function(val) {
+        validator: function (val) {
           // this only points to current doc on NEW document creation
           return val < this.price;
         },
@@ -122,19 +122,19 @@ tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
 tourSchema.index({ startLocation: '2dsphere' });
 
-tourSchema.virtual('durationWeeks').get(function() {
+tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
 // Virtual populate
 tourSchema.virtual('reviews', {
   ref: 'Review',
-  foreignField: 'tour',
-  localField: '_id'
+  foreignField: 'tour', //where the _id of the tour is stored
+  localField: '_id' // name of the local _id is
 });
 
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
-tourSchema.pre('save', function(next) {
+tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
@@ -157,7 +157,7 @@ tourSchema.pre('save', function(next) {
 
 // QUERY MIDDLEWARE
 // tourSchema.pre('find', function(next) {
-tourSchema.pre(/^find/, function(next) {
+tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
 
   this.start = Date.now();
@@ -165,11 +165,13 @@ tourSchema.pre(/^find/, function(next) {
 });
 
 tourSchema.pre(/^find/, function(next) {
+  //instead of doing it in two places of the controller
   this.populate({
+    // this is the query
     path: 'guides',
-    select: '-__v -passwordChangedAt'
-  });
-
+    // populate, fill up the guides fields. Only works with _id .populate('guides')
+    select: '-__v -passwordChangedAt' // everything minus those fields
+  }); //with out execPoopulate does not work, maybe it does work
   next();
 });
 
@@ -177,6 +179,10 @@ tourSchema.post(/^find/, function(docs, next) {
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
   next();
 });
+// tourSchema.pre('aggregate', function (next) {
+//     this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//     next();
+// }); //comented because geoNear needs to be the first aggregate function
 
 // AGGREGATION MIDDLEWARE
 // tourSchema.pre('aggregate', function(next) {

@@ -29,16 +29,16 @@ const reviewSchema = new mongoose.Schema(
     }
   },
   {
-    toJSON: { virtuals: true },
+    toJSON: { virtuals: true }, // to show up virtual fields
     toObject: { virtuals: true }
   }
 );
 
 reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
-reviewSchema.pre(/^find/, function(next) {
+reviewSchema.pre(/^find/, function(next) { //instead of doing it in two places of the controller
   // this.populate({
-  //   path: 'tour',
+  //   path: 'tour', 'tour' it makes no sense get the tour in the review, the tour already has the fields
   //   select: 'name'
   // }).populate({
   //   path: 'user',
@@ -53,13 +53,13 @@ reviewSchema.pre(/^find/, function(next) {
 });
 
 reviewSchema.statics.calcAverageRatings = async function(tourId) {
-  const stats = await this.aggregate([
+  const stats = await this.aggregate([ //aggregate always must be called on the model
     {
       $match: { tour: tourId }
     },
     {
-      $group: {
-        _id: '$tour',
+      $group: { //like a group by
+        _id: '$tour', // _id always first
         nRating: { $sum: 1 },
         avgRating: { $avg: '$rating' }
       }
@@ -80,8 +80,9 @@ reviewSchema.statics.calcAverageRatings = async function(tourId) {
   }
 };
 
-reviewSchema.post('save', function() {
+reviewSchema.post('save', function() { // post does not have acces to next
   // this points to current review
+  //calls the constructor because the Review is going to be created in the next line
   this.constructor.calcAverageRatings(this.tour);
 });
 
